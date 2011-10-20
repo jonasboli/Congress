@@ -1,0 +1,23 @@
+application: devchat
+version: 1
+runtime: python
+api_version: 1
+
+handlers:
+- url: /stylesheets
+  static_dir: stylesheets
+  
+- url: /javascript
+  static_dir: javascript
+
+- url: /(.*\.(gif|png|jpg))
+  static_files: static/\1
+  upload: static/(.*\.(gif|png|jpg))
+  expiration: "1d"
+  
+- url: /.*
+  script: main.py
+  
+- url: /tasks/scrape
+  script: main.py
+  login: admin

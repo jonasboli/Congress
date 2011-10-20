@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block header %}
+    My Recent Votes
+{% endblock %}        
+
+{% block content %}
+    {% for v in recent_votes %}
+           <div class="bill" onclick="window.location.href = '/bill/{{v.bill.chamber}}/{{v.bill.number}}';">
+               <div class="carrot">
+                   >
+               </div>
+               <div class="bill_list_item">
+                      H.R. {{v.bill.number}}: {{v.bill.short_title}}
+               </div>
+           </div>
+
+    {% endfor %}
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}    

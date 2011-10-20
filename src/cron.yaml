@@ -1,0 +1,4 @@
+cron:
+- description: daily scraping job
+  url: /tasks/scrape
+  schedule: every day 09:00

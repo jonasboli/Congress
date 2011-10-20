@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+
+{% block header %}
+    {% if day_string %}
+        Bills for {{ day_string }}
+    {% else %}
+        Today's Bills
+    {% endif %}
+{% endblock %}        
+
+{% block content %}
+    {% if activities %}
+	    {% for a in activities %}
+		   <div class="bill" onclick="window.location.href = '/bill/{{a.bill.chamber}}/{{a.bill.number}}';">
+		       <div class="carrot">
+		           >
+	           </div>
+			   <div class="bill_list_item">
+			          House Bill {{a.bill.number}}: <br /> 
+			          {{a.bill.short_title}}
+			   </div>
+	       </div>
+	    {% endfor %}
+    {% else %}
+        Sorry, no bills on this day!
+    {% endif %}
+{% endblock %}
+    
+{% block footer %}                            
+    {% if previous_day %}
+        <a class="previous_link internal_link" href="/main/{{previous_day.year}}/{{previous_day.month}}/{{previous_day.day}}">< previous</a>
+    {% endif %}
+    {% if next_day %}
+        <a class="next_link internal_link" href="/main/{{next_day.year}}/{{next_day.month}}/{{next_day.day}}">next ></a>
+    {% endif %}
+{% endblock %}
+
+
+{% block scripts %}
+{% endblock %}    
