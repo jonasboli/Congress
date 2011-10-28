@@ -1,0 +1,35 @@
+
+/*INDEX PAGE*/
+.carrot
+{
+    float:right;
+    width:20px;
+    height:100%;
+    margin-top:15px;
+    //background:#EEEEEE;
+}
+.bill
+{
+    display:block;
+    border-bottom: 1px solid gray;
+    height:70px;
+    //width:100%;
+    padding-top:15px;
+    padding-left:10px;
+    padding-right:10px;
+    cursor:pointer;
+    
+}
+.bill:hover
+{
+    background-color:#DDDFFF;
+}
+.previous_link
+{
+    float:left;
+}
+.next_link
+{
+    float:right;
+}
+

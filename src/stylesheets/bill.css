@@ -1,0 +1,106 @@
+
+/*BILL DETAILS PAGE*/
+
+.bill_content
+{
+	padding:10px;
+}
+
+.short_title
+{
+    font-weight: bold;
+}
+.bill_summary
+{
+    margin:0;
+    margin-bottom: 10px;
+    display:block;
+}
+.sponsor_info
+{
+    height:40px;
+}
+.sponsor_label
+{
+    display:inline;
+    margin-bottom:25px;
+}
+.sponsor_photo
+{
+    height:35px;
+    float:right;
+}
+.vote_label
+{
+    display:inline-block;
+    margin-right:25px;
+}
+.vote_div
+{
+    margin:0 auto;
+    margin-top:5px;
+    margin-bottom:5px; 
+}
+.vote_buttons
+{
+    display:inline-block; 
+}
+.vote_button
+{
+    display:inline-block;
+    text-align:center;
+    border: 1px solid gray;
+    border-radius: 3px;
+    background-color:#DDDDDD;
+    height:13px;
+    padding:3px;
+    margin:3px;
+    width:45px;
+}
+.vote_button:hover
+{
+    background-color:#CCCCCC;
+    cursor:pointer;
+}
+.vote_counts_div
+{
+    display:inline-block;
+}
+.vote_count_div
+{
+    display:inline-block;
+    text-align:center;       
+    padding-left:4px;
+    padding-right:4px;
+}
+.vote_count_div_voted
+{
+    border-radius:5px;
+    background:#0DFF45;
+}
+.vote_count_label, .vote_count
+{
+    padding-left:4px;
+    padding-right:4px;
+    width:45px;    
+}
+.user_vote
+{
+    display:inline;
+}
+
+
+.comments_toggle
+{
+    margin:0 auto;
+    margin-top:5px;
+    margin-bottom:5px; 
+    
+    background-color:#DDDDDD;
+    height:15px;
+    padding:3px;
+    width:100%;
+    text-align:center;
+    cursor:pointer;
+    border-radius:5px;
+}

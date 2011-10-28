@@ -12,6 +12,7 @@
 <path>/congress/src</path>
 <path>/congress/src/BeautifulSoup-3.2.0</path>
 <path>/congress/src/RTC_API/RTC-python-library</path>
+<path>/congress/src/python</path>
 </pydev_pathproperty>
 <pydev_pathproperty name="org.python.pydev.PROJECT_EXTERNAL_SOURCE_PATH">
 <path>${GOOGLE_APP_ENGINE}</path>

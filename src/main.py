@@ -17,8 +17,9 @@ from BeautifulSoup import BeautifulSoup
 import urllib2
 import re
 import RTC
-import RTCtest
 from pprint import *
+
+import Foo
 
 
 RTC.API_KEY = 'c448541518f24d79b652ccc57b384815'
@@ -29,7 +30,77 @@ RTC.apikey = 'c448541518f24d79b652ccc57b384815'
 class User(db.Model):
     zip = db.StringProperty()
     user_id = db.StringProperty()
+    last_visit_at = db.DateTimeProperty()
+    
+    def get_update_count(self):
+        votes = self.vote_set
+        count = 0
+        for v in votes:
+            #logging.debug("BILL: " + str(v.bill.number))
+            #logging.debug("BILL LAST PASSAGE VOTE: " + str(v.bill.last_passage_vote_at))
+            #logging.debug("USER LAST VISIT AT: " + str(self.last_visit_at))
+            if v.bill.last_passage_vote_at > self.last_visit_at:
+                count = count + 1
+        logging.debug("UPDATE COUNT: " + str(count))
+        return count
 
+    def get_recent_bills(self):
+        recent_bills = [] 
+        for v in self.vote_set:
+            #logging.debug("RECENT")
+            #logging.debug("BILL: " + str(v.bill.number))
+            #logging.debug("BILL LAST PASSAGE VOTE: " + str(v.bill.last_passage_vote_at))
+            #logging.debug("USER LAST VISIT AT: " + str(self.last_visit_at))
+      
+            #filter to bills updated in the last 10 days
+            if v.bill.last_passage_vote_at > (datetime.datetime.now() - datetime.timedelta(days=-10)):
+                recent_bills = recent_bills + v.bill
+                #TODO: sort the bills by updated date
+        return recent_bills
+    
+    def get_updated_bills(self):
+        #TODO: sort the bills by updated date
+        #TODO: build the front end to process this format
+        updated_bills = []
+        for v in self.vote_set:    
+            logging.debug("UPDATED")
+            logging.debug("BILL: " + str(v.bill.number))
+            logging.debug("BILL LAST PASSAGE VOTE: " + str(v.bill.last_passage_vote_at))
+            logging.debug("USER LAST VISIT AT: " + str(self.last_visit_at))
+            
+            #filter to bills updated since last visit
+            if (v.bill.last_passage_vote_at > self.last_visit_at) or (v.bill.last_passage_vote_at > (datetime.datetime.now() - datetime.timedelta(days=10))):
+                logging.debug("FOUND UPDATED BILL")
+            
+                last_house_vote = None
+                last_senate_vote = None
+                
+                #find the last house and senate votes
+                c_votes = v.bill.congressionalvote_set
+                c_votes.order('-voted_at')
+                for c_v in c_votes:
+                    if (not last_house_vote) and (c_v.chamber == 'house'):
+                        last_house_vote = c_v
+                    elif (not last_senate_vote) and (c_v.chamber == 'senate'):
+                        last_senate_vote = c_v
+                    elif last_house_vote and last_senate_vote:
+                        break
+
+                bill_data = {}
+                bill_data['last_house_vote'] = v.value
+                bill_data['last_senate_vote'] = v.value
+                bill_data['user_vote'] = v.value
+                bill_data['bill'] = v.value
+                if v.bill.last_passage_vote_at > self.last_visit_at:
+                    bill_data['kind'] = 'updated'
+                elif v.bill.last_passage_vote_at > (datetime.datetime.now() - datetime.timedelta(days=10)):
+                    bill_data['kind'] = 'recent'
+                
+                updated_bills = updated_bills + [bill_data]
+        return updated_bills
+    
+    
+    
 class CongressPerson(db.Model):
     first_name = db.StringProperty()
     last_name = db.StringProperty()
@@ -108,13 +179,22 @@ class BaseHandler(webapp.RequestHandler):
         super(BaseHandler, self).initialize(request, response)
 
         try:
+            #handle the cookie
             self.handle_cookie()
             self.response.headers[u'P3P'] = u'CP=HONK'  # iframe cookies in IE
+            
+            #if we've found a user, update the last_visited_at field
+            if self.user:
+                self.user.last_visit_at = datetime.datetime.now()
+                self.user.put()
+            
         except Exception, ex:
             raise
     
     #loads up the current user object based on a cookie
     #creates a new uuid if no cookie found
+    #doesnt create a new User yet because the following
+    #request may include one, as retrieved from local storage
     def handle_cookie(self):
         # fetch cookie from os.environ dictionary
         cookie_string = os.environ.get('HTTP_COOKIE')
@@ -161,21 +241,31 @@ class MainPage(BaseHandler):
     def get(self, year=None, month=None, day=None):        
         date_obj = None
         
-        if year and month and day:
-            date_obj = datetime.datetime(int(year), int(month), int(day))            
-        else:
-            date_obj = get_most_recent_day() 
-        
-        activities = get_activities_by_day(date_obj)
-        day_string = date_obj.strftime('%b %d')
-        previous_day = get_previous_day(date_obj)
-        next_day = get_next_day(date_obj)
-        
-        self.render('index', 
-                        activities=activities,
-                        day_string=day_string,
-                        previous_day=previous_day,
-                        next_day=next_day)
+        try:
+            if year and month and day:
+                date_obj = datetime.datetime(int(year), int(month), int(day))            
+            else:
+                date_obj = get_most_recent_day() 
+            
+            if date_obj:
+                activities = get_activities_by_day(date_obj)
+                day_string = date_obj.strftime('%b %d')
+                previous_day = get_previous_day(date_obj)
+                next_day = get_next_day(date_obj)
+                
+                self.render('index', 
+                                activities=activities,
+                                day_string=day_string,
+                                previous_day=previous_day,
+                                next_day=next_day)
+        except:
+            logging.error('Error in main page handler')
+            
+
+class AjaxUpdateCount(BaseHandler):        
+    def post(self):
+        update_count = self.user.get_update_count()        
+        self.render('ajax_update_count', update_count=update_count)
 
 def get_previous_day(reference_day):
     q = Activity.all()
@@ -206,6 +296,7 @@ def get_most_recent_day():
     if (len(results) > 0):
         most_recent_day = results[0].day
         return most_recent_day
+    return None
 
 def get_activities_by_day(date_obj):
     q = Activity.all()
@@ -224,13 +315,21 @@ class RecentVotesPage(BaseHandler):
 
 class UpdatesPage(BaseHandler):
     def get(self):
-        user_votes = self.user.vote_set.order('-created')
-        for v in user_votes:
-            c_votes = v.bill.congressionalvote_set
-            logging.debug("C VOTES = " + str(c_votes))
-        
-        self.render('updates',
-                        user_votes=user_votes)
+        if self.user:
+            updated_bills = self.user.get_updated_bills()        
+            recent_bills = self.user.get_recent_bills()        
+      
+            user_votes = self.user.vote_set.order('-created')
+            
+            #TODO - make the front end render using the bills, not the user votes
+            self.render('updates',
+                        user_votes=user_votes,
+                        updated_bills=updated_bills,
+                        recent_bills=recent_bills)
+        else:        
+            self.render('updates',
+                        user_votes=None,
+                        updated_bills=None)
 
 
 class WelcomePage(BaseHandler):
@@ -280,8 +379,7 @@ class BillPage(BaseHandler):
                         aye_count=aye_count,
                         nay_count=nay_count,
                         abstention_count=abstention_count)
-
-        
+      
 class VoteHandler(BaseHandler):
     def post(self):        
         #look up the bill
@@ -608,19 +706,24 @@ class CongressionalVotesWorker(webapp.RequestHandler):
             rtc_votes = RTC.Votes.get_by_bill(db_bill.rtc_id).votes
             last_house_day = 0
             last_senate_day = 0
+            logging.debug("FETCHED RTC VOTES:  COUNT = " + str(len(rtc_votes)))
+       
             for v in rtc_votes:
+                logging.debug("looking for a passage vote")
                 if str(v.vote_type) == 'passage':
                     #create the new c vote
                     c_vote = get_or_create_new_c_vote(v, db_bill)                    
                     
                     #update the Bill 
-                    if (not db_bill.last_passage_vote_at):
-                        if (c_vote.chamber.lower() == 'house') and (c_vote.voted_at > last_house_day):
-                            db_bill.last_passage_vote_at = c_vote.voted_at
-                            db_bill.last_house_vote = c_vote
-                        elif (c_vote.chamber.lower() == 'senate') and (c_vote.voted_at > last_senate_day):
-                            db_bill.last_passage_vote_at = c_vote.voted_at
-                            db_bill.last_senate_vote = c_vote
+                    if (c_vote.chamber.lower() == 'house') and (c_vote.voted_at > last_house_day):
+                        db_bill.last_passage_vote_at = c_vote.voted_at
+                        db_bill.last_house_vote = c_vote
+                        logging.debug("NEW CONGRESSIONAL VOTE CREATED FOR: " + str(db_bill.number))
+                        db_bill.put()
+                    elif (c_vote.chamber.lower() == 'senate') and (c_vote.voted_at > last_senate_day):
+                        db_bill.last_passage_vote_at = c_vote.voted_at
+                        db_bill.last_senate_vote = c_vote
+                        logging.debug("NEW CONGRESSIONAL VOTE CREATED FOR: " + str(db_bill.number))
                         db_bill.put()
             
 def get_or_create_new_c_vote(v, db_bill):
@@ -661,7 +764,8 @@ application = webapp.WSGIApplication(
                                         ('/bill', BillPage),
                                         ('/main', MainPage),
                                         ('/main/(.*)/(.*)/(.*)', MainPage), #/main/year/month/day
-                                        ('/recentvotes', RecentVotesPage),
+                                        ('/ajax_fetch_update_count', AjaxUpdateCount),
+                                        #('/recentvotes', RecentVotesPage),
                                         ('/updates', UpdatesPage),
                                         ('/bill/(.*)/(.*)', BillPage), #/[House|Senate]/[1234]
                                         ('/tasks/scrape', ScrapeWorker),

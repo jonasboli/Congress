@@ -5,47 +5,48 @@
 {% endblock %}        
 
 {% block content %}
-    {% for v in user_votes %}
-        {% for c_v in v.bill.congressionalvote_set %}
-           <!-- bill:   {{v.bill.short_title}} <br/>
-           result:   {{c_v.result}} <br/>
-           yeas:   {{c_v.yeas}} <br/>
-           nays:   {{c_v.nays}} <br/>
-           abstentions:   {{c_v.abstentions}} <br/>-->
-           ----------------------------
-           <div class="bill" onclick="window.location.href = '/bill/{{v.bill.chamber}}/{{v.bill.number}}';">
-               <div class="carrot">
-                   >
-               </div>
-               <div class="bill_list_item">
-					<div>
-					      H.R. {{v.bill.number}}: {{v.bill.short_title}}
-					</div>
-					<div>
-					      Your vote:  {{v.value|capfirst}}
-					</div>
-					<div>
-					      Congress vote:  {{c_v.result}}
-					</div>
-					<div id="vote_counts_div" class="vote_counts_div"> 
-						<div class="vote_count_div">
-						    <div class="vote_count_label">Ayes</div>
-						    <div id="aye_count" class="vote_count">{{c_v.yeas}}</div>
+    {% if not user_votes %}
+        <div>
+            Sorry, no updates for you today.
+            TODO: show all recent updates.
+        </div>
+    {% else %}
+	    {% for v in user_votes %}
+	        {% for c_v in v.bill.congressionalvote_set %}
+	           <div class="bill" onclick="window.location.href = '/bill/{{v.bill.chamber}}/{{v.bill.number}}';">
+	               <div class="carrot">
+	                   >
+	               </div>
+	               <div class="bill_list_item">
+						<div>
+						      H.R. {{v.bill.number}}: {{v.bill.short_title}}
 						</div>
-						<div class="vote_count_div">
-						    <div class="vote_count_label">Nays</div>
-						    <div id="nay_count" class="vote_count">{{c_v.nays}}</div>
+						<div>
+						      Your vote:  {{v.value|capfirst}}
 						</div>
-						<div class="vote_count_div">
-						    <div class="vote_count_label">Abstentions</div>
-						    <div id="abstention_count" class="vote_count">{{c_v.abstentions}}</div>
+						<div>
+						      Congress vote:  {{c_v.result}}
 						</div>
-					</div>
-            </div>
-               </div>
-           </div>
-        {% endfor %}
-    {% endfor %}
+						<div id="vote_counts_div" class="vote_counts_div"> 
+							<div class="vote_count_div">
+							    <div class="vote_count_label">Ayes</div>
+							    <div id="aye_count" class="vote_count">{{c_v.yeas}}</div>
+							</div>
+							<div class="vote_count_div">
+							    <div class="vote_count_label">Nays</div>
+							    <div id="nay_count" class="vote_count">{{c_v.nays}}</div>
+							</div>
+							<div class="vote_count_div">
+							    <div class="vote_count_label">Abstentions</div>
+							    <div id="abstention_count" class="vote_count">{{c_v.abstentions}}</div>
+							</div>
+						</div>
+	            </div>
+	               </div>
+	           </div>
+	        {% endfor %}
+	    {% endfor %}
+    {% endif %}
 {% endblock %}
 
 {% block scripts %}

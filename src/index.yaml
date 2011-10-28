@@ -16,6 +16,12 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
+- kind: CongressionalVote
+  properties:
+  - name: bill
+  - name: voted_at
+    direction: desc
+
 - kind: Vote
   properties:
   - name: user

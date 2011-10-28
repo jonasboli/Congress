@@ -1,10 +1,16 @@
 {% extends "base.html" %}
 
+{% block stylesheets %}                            
+    <link type="text/css" rel="stylesheet" href="/stylesheets/bill.css" />
+{% endblock %}
+
 {% block header %}
 {{bill.chamber}} Bill #{{bill.number}}
 {% endblock %}
 
 {% block content %}
+    <div class="bill_content">
+        
 	    <div class="short_title">
 	       {{bill.short_title}}
 	    </div>
@@ -95,13 +101,15 @@
 		<div id="comments_toggle" class="comments_toggle" onclick="show_hide_comments()">show comments</div>
 		<div id="fb-root"></div>
 		<div id="comments" style="display:none" class="fb-comments" data-href="/bill/{{bill.chamber}}/{{bill.number}}" data-num-posts="1" data-width="300"></div>
-    
+    </div>
 
 {% endblock %}
 
 {% block scripts %}
-    
+  
     <script type="text/javascript" charset="utf-8">
+        
+        /* send a vote to the server */
         function vote(chamber, number, vote_value){
             update_vote_count(vote_value)
             show_vote_counts(vote_value);
@@ -110,12 +118,15 @@
             	});
             
         }
+        /* show the vote counts and hide the vote buttons*/
         function show_vote_counts(val){
             votes_counts_div = document.getElementById('vote_counts_div');
             vote_buttons = document.getElementById('vote_buttons');
             vote_buttons.style.display = "none";
             votes_counts_div.style.display = "inline-block";
         }
+        
+        /* update the vote counts */
         function update_vote_count(val){
             //increment the appropriate vote count by one
             aye_count = {{aye_count}} + ((val == 'aye') ? 1 : 0);
@@ -136,6 +147,8 @@
             nays_div.className = ((val == 'nay') ? 'vote_count_div vote_count_div_voted' : 'vote_count_div');
             abstentions_div.className = ((val == 'abstain') ? 'vote_count_div vote_count_div_voted' : 'vote_count_div');
         }
+        
+        /* show/hide the FB comments section*/
         function show_hide_comments(){
             c = document.getElementById('comments');
             t = document.getElementById('comments_toggle');
@@ -150,6 +163,7 @@
         }        
     </script>
     <script>
+        /* FB provided JS for the comments box */
 	    (function(d, s, id) {
 	          var js, fjs = d.getElementsByTagName(s)[0];
 	          if (d.getElementById(id)) {return;}

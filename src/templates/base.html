@@ -1,71 +1,97 @@
 <html>
   <head>
     <link type="text/css" rel="stylesheet" href="/stylesheets/main.css" />
-    
+    {% block stylesheets %}                            
+    {% endblock %}
+         
   </head>
   <body>
-    <div class="main_frame">
-        <div class="main_content">        
-	       <div class="header">
-                <h1>
-                    {% block header %}                            
-                    {% endblock %}
-                </h1>
-                <a class="header_link header_link_left" href="/">
-                   ^
-                </a>
-                <a class="header_link header_link_right" href="/recentvotes">
-                   *
-                </a>
-            </div>
-            {% block content %}
-            {% endblock %}
-            <div class="footer">
-                {% block footer %}                            
-                {% endblock %}
-            </div>
-            
-        </div>
-    </div>      
+  <div class="main_frame">
+        
+      <div class="header">
+		<h1>
+		    {% block header %}                            
+		    {% endblock %}
+		</h1>
+		<a class="header_link header_link_left" href="/">
+		   H
+		</a>
+		<a class="header_link header_link_right" href="/updates">
+           U
+	       <div id="update_count" class="update_count">
+              1
+           </div>
+		</a>
+      </div>
+      <div class="main_content">       
+          {% block content %}
+          {% endblock %}
+      </div>
+      <div class="footer">
+          {% block footer %}                            
+          {% endblock %}
+      </div>        
+      </div>
   </body>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
   <script src="/javascript/jquery.hint.js"></script>
   <script src="/javascript/jquery.cookies.2.2.0.min.js"></script>
   <script type="text/javascript" charset="utf-8"> 
+            /* JS for hint text in form inputs */
             $(function(){ 
                 // find all the input elements with title attributes
                 $('input[title!=""]').hint();
             });
   </script>
-        <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript" charset="utf-8">
+        /* JS for cookie & local storage handling */
         function hasLocalStorageSupport()  
-        {  
-            if (localStorage)  
-                return true;  
-            else  
-                return false;  
-        }
-        
-        $(document).ready(function(){
-        	
-        	  //handle cookies and localstorage
-              if (hasLocalStorageSupport()){
-            	  //if there is a user id in local storage, tell the server via cookie
-            	  if (localStorage['uuid']){
-            		  $.cookies.set('uuid', localStorage['uuid'] );
-                  }
-            	  //if there is no id in local storage, set new one from the server
-            	  else{
-	                  localStorage['uuid'] = '{{ new_user_id }}';                       
-	                  $.cookies.set( 'uuid', '{{ new_user_id }}');
-            	  }
-              }
-              else{
-                  //no local storage support
-              }
-        });
-        
+	    {  
+	        if (localStorage)  
+	            return true;  
+	        else  
+	            return false;  
+	    }
+	    
+	    $(document).ready(function(){
+	    	  //handle cookies and localstorage
+	          if (hasLocalStorageSupport()){
+	        	  //if there is a user id in local storage, tell the server via cookie
+	        	  if (localStorage['uuid']){
+	        		  $.cookies.set('uuid', localStorage['uuid'] );
+	              }
+	        	  //if there is no id in local storage, set new one from the server
+	        	  else{
+	               localStorage['uuid'] = '{{ new_user_id }}';                       
+	               $.cookies.set( 'uuid', '{{ new_user_id }}');
+	        	  }
+	          }
+	          else{
+	              //no local storage support
+	          }
+	    });
     </script>
+    <script type="text/javascript" charset="utf-8"> 
+            /* JS for text fetching the bill updates count */
+            $(document).ready(function(){
+            	   alert('updating update count');
+                	update_count = data.update_count;
+                	update_update_count(update_count);
+            	});
+            }
+            
+            function update_update_count(count){
+                update_count_div = document.getElementById('update_count');
+                update_count_div.innerHTML = count;
+                if (count == 0){
+                	update_count_div.style.display = 'none';
+                }
+                else if (count > 0){
+                    update_count_div.style.display = 'inline-block';
+                }
+            }
+    </script>
+    
   {% block scripts %}
   {% endblock %} 
 </html>
