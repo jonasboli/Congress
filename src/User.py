@@ -44,7 +44,10 @@ class User(db.Model):
             #logging.debug("BILL: " + str(v.bill.number))
             #logging.debug("BILL LAST PASSAGE VOTE: " + str(v.bill.last_passage_vote_at))
             #logging.debug("USER LAST VISIT AT: " + str(self.last_visit_at))
-      
+ 
+            if v.bill.last_passage_vote_at == None:
+                continue
+           
             #filter to bills updated in the last 10 days
             if v.bill.last_passage_vote_at > (datetime.datetime.now() - datetime.timedelta(days=-10)):
                 recent_bills = recent_bills + v.bill
@@ -60,6 +63,9 @@ class User(db.Model):
             logging.debug("BILL: " + str(v.bill.number))
             logging.debug("BILL LAST PASSAGE VOTE: " + str(v.bill.last_passage_vote_at))
             logging.debug("USER LAST VISIT AT: " + str(self.last_visit_at))
+            
+            if v.bill.last_passage_vote_at == None:
+                continue
             
             #filter to bills updated since last visit
             if (v.bill.last_passage_vote_at > self.last_visit_at) or (v.bill.last_passage_vote_at > (datetime.datetime.now() - datetime.timedelta(days=10))):

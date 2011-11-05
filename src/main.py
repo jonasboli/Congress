@@ -26,6 +26,7 @@ import Vote
 import CongressionalVote
 import CongressPerson
 import CongressScraper
+import CongressionalVotesWorker
 
 RTC.API_KEY = 'c448541518f24d79b652ccc57b384815'
 RTC.apikey = 'c448541518f24d79b652ccc57b384815'
@@ -251,7 +252,7 @@ class VoteHandler(BaseHandler):
         #get the vote value
         value = db.Category(self.request.get('vote_value'))
         
-        vote = Vote(user=self.user,
+        vote = Vote.Vote(user=self.user,
                     bill=bill,
                     value=value)
         vote.put()
@@ -259,12 +260,12 @@ class VoteHandler(BaseHandler):
 
 class ScrapeWorker(webapp.RequestHandler):
     def get(self):
-        scraper = CongressScraper()
+        scraper = CongressScraper.CongressScraper()
         scraper.scrape_day()
 
-class CongressionalVotesWorker(webapp.RequestHandler):
+class CongressionalVotesWorkerHandler(webapp.RequestHandler):
     def get(self):
-        worker = CongressionalVotesWorker()
+        worker = CongressionalVotesWorker.CongressionalVotesWorker()
         worker.fetch()
 
 application = webapp.WSGIApplication(
@@ -279,7 +280,7 @@ application = webapp.WSGIApplication(
                                         ('/updates', UpdatesPage),
                                         ('/bill/(.*)/(.*)', BillPage), #/[House|Senate]/[1234]
                                         ('/tasks/scrape', ScrapeWorker),
-                                        ('/tasks/process_congressional_votes', CongressionalVotesWorker)],
+                                        ('/tasks/process_congressional_votes', CongressionalVotesWorkerHandler)],
                                      debug=True)
 
 def main():

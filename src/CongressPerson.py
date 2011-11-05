@@ -28,10 +28,10 @@ class CongressPerson(db.Model):
     district = db.StringProperty()
     govtrack_id = db.StringProperty()
 
-    @classmethod
+    @staticmethod
     def get_or_create_new_congress_person(rtc_bill):
         if rtc_bill.sponsor:
-            q = CongressPerson.CongressPerson.all()
+            q = CongressPerson.all()
             q.filter("govtrack_id =", str(rtc_bill.sponsor.govtrack_id))
             results = q.fetch(1)            
             if len(results) > 0:
@@ -47,7 +47,7 @@ class CongressPerson(db.Model):
                 elif rtc_bill.sponsor.party == 'I':
                     party = 'Independent'
                 
-                new_congress_person = CongressPerson.CongressPerson(
+                new_congress_person = CongressPerson(
                                             first_name=rtc_bill.sponsor.first_name,
                                             last_name=rtc_bill.sponsor.last_name,
                                             chamber=db.Category((rtc_bill.sponsor.chamber).capitalize()),

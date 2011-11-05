@@ -72,13 +72,12 @@
 	    });
     </script>
     <script type="text/javascript" charset="utf-8"> 
-            /* JS for text fetching the bill updates count */
+            /* JS for fetching the bill updates count */
             $(document).ready(function(){
-            	   alert('updating update count');
-                	update_count = data.update_count;
+            	   //alert('updating update count');
+                	update_count = 3;//data.update_count;//TODO: make this come from the server
                 	update_update_count(update_count);
             	});
-            }
             
             function update_update_count(count){
                 update_count_div = document.getElementById('update_count');

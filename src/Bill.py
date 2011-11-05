@@ -42,8 +42,8 @@ class Bill(db.Model):
     last_house_vote = db.Key()
     last_senate_vote = db.Key()
     
-    @classmethod
-    def get_by_chamber_and_number(cls, chamber, number):
+    @staticmethod
+    def get_by_chamber_and_number(chamber, number):
         q = Bill.all()
         q.filter('chamber = ', str(chamber))
         q.filter('number = ', int(number))
@@ -52,12 +52,12 @@ class Bill(db.Model):
             return result[0]
         return None
     
-    @classmethod
+    @staticmethod
     def get_or_create_new_bill(bill_number, chamber):
         logging.debug("FOUND BILL:  " +  str(bill_number))
     
         #find any existing record of this bill
-        q = Bill.Bill.all()
+        q = Bill.all()
         q.filter("number =", int(bill_number))
         results = q.fetch(1) 
         if len(results) > 0:
@@ -84,7 +84,7 @@ class Bill(db.Model):
                 popular_title = rtc_bill.popular_title if rtc_bill.short_title else "No Title"
                 
                 #create the new bill
-                new_bill = Bill.Bill(rtc_id=rtc_bill.bill_id,
+                new_bill = Bill(rtc_id=rtc_bill.bill_id,
                                 number=int(bill_number),
                                         chamber=db.Category((rtc_bill.chamber).capitalize()),
                                         summary=summary,

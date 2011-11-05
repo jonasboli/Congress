@@ -31,8 +31,11 @@ import CongressPerson
 
 
 
-class CongressionalVotesWorker():
+class CongressionalVotesWorker(object):
                  
+    def __init__(self):
+        pass
+    
     def fetch(self):
         q = Activity.Activity.all()
         q.order('-day')

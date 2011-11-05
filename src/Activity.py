@@ -25,17 +25,17 @@ class Activity(db.Model):
     activity_description = db.StringProperty()
     committee_description = db.StringProperty()
 
-    @classmethod
+    @staticmethod
     def get_or_create_new_activity(bill, day, description):
         logging.debug("FOUND ACTIVITY = " + str(bill) + ", " + str(day) + ', ' + str(description))
         
         #find any existing record of this activity
-        q = Activity.Activity.all()
+        q = Activity.all()
         q.filter("bill =", bill)
         q.filter("day =", day)
         results = q.fetch(1)            
         if len(results) == 0:
-            new_activity = Activity.Activity(bill=bill,
+            new_activity = Activity(bill=bill,
                                     day=day,
                                     activity_description=description)
             new_activity.put()

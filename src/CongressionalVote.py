@@ -36,7 +36,7 @@ class CongressionalVote(db.Model):
     rep_nays = db.IntegerProperty()
     rep_abstentions = db.IntegerProperty()
 
-    @classmethod        
+    @staticmethod        
     def get_or_create_new_c_vote(v, db_bill):
         q = CongressionalVote.CongressionalVote.all()
         q.filter('number = ', v.number)

@@ -31,7 +31,10 @@ import CongressPerson
 
 
 
-class CongressScraper():
+class CongressScraper(object):
+    
+    def __init__(self):
+        pass
     
     class BlockType:
         a = 1
@@ -109,7 +112,7 @@ class CongressScraper():
             #    action_type = find_action_type_in_block(block.parent, block_type)
             if block_type == self.BlockType.p and block.contents:
                 action_type = self.find_action_type_in_block(block.contents[0], block_type)
-            bill = self.get_or_create_new_bill(bill_number, 'house')
+            bill = Bill.Bill.get_or_create_new_bill(bill_number, 'house')
             Activity.Activity.get_or_create_new_activity(bill, day, action_type)
     
     
