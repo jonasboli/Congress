@@ -38,7 +38,7 @@ class CongressionalVote(db.Model):
 
     @staticmethod        
     def get_or_create_new_c_vote(v, db_bill):
-        q = CongressionalVote.CongressionalVote.all()
+        q = CongressionalVote.all()
         q.filter('number = ', v.number)
         result = q.fetch(1)
         if len(result) > 0:
@@ -47,7 +47,7 @@ class CongressionalVote(db.Model):
             voted_at = datetime.datetime.strptime(v.voted_at, "%Y-%m-%dT%H:%M:%SZ")
             
             #create the CongressionalVote
-            new_c_vote = CongressionalVote.CongressionalVote(
+            new_c_vote = CongressionalVote(
                             voted_at = voted_at,
                             bill = db_bill,
                             number = v.number,

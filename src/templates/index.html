@@ -13,8 +13,8 @@
 {% endblock %}        
 
 {% block content %}
-    {% if activities %}
-	    {% for a in activities %}
+    {% if todays_activities %}
+	    {% for a in todays_activities %}
 		   <div class="bill" onclick="window.location.href = '/bill/{{a.bill.chamber}}/{{a.bill.number}}';">
 		       <div class="carrot">
 		           >

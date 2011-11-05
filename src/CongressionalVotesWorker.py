@@ -21,6 +21,8 @@ from BeautifulSoup import BeautifulSoup
 import RTC
 RTC.API_KEY = 'c448541518f24d79b652ccc57b384815'
 RTC.apikey = 'c448541518f24d79b652ccc57b384815'
+MAX_ACTIVITIES_TO_PROCESS = 10
+
 
 import User
 import Bill
@@ -39,13 +41,12 @@ class CongressionalVotesWorker(object):
     def fetch(self):
         q = Activity.Activity.all()
         q.order('-day')
-        activities = q.fetch(1)
+        activities = q.fetch(MAX_ACTIVITIES_TO_PROCESS)
         for a in activities:
             db_bill = a.bill
-            #rtc_bill = RTC.Bill.get_bill(bill_id=db_bill.bill_id)
             rtc_votes = RTC.Votes.get_by_bill(db_bill.rtc_id).votes
-            last_house_day = 0
-            last_senate_day = 0
+            last_house_day = datetime.datetime.min
+            last_senate_day = datetime.datetime.min
             logging.debug("FETCHED RTC VOTES:  COUNT = " + str(len(rtc_votes)))
        
             for v in rtc_votes:

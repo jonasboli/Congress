@@ -37,7 +37,7 @@ class User(db.Model):
         logging.debug("UPDATE COUNT: " + str(count))
         return count
 
-    def get_recent_bills(self):
+    def get_recent_bills(self, count):
         recent_bills = [] 
         for v in self.vote_set:
             #logging.debug("RECENT")
@@ -49,7 +49,7 @@ class User(db.Model):
                 continue
            
             #filter to bills updated in the last 10 days
-            if v.bill.last_passage_vote_at > (datetime.datetime.now() - datetime.timedelta(days=-10)):
+            if v.bill.last_passage_vote_at > (datetime.datetime.now() - datetime.timedelta(days=-count)):
                 recent_bills = recent_bills + v.bill
                 #TODO: sort the bills by updated date
         return recent_bills

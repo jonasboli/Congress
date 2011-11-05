@@ -31,6 +31,7 @@ import CongressionalVotesWorker
 RTC.API_KEY = 'c448541518f24d79b652ccc57b384815'
 RTC.apikey = 'c448541518f24d79b652ccc57b384815'
 #http://api.realtimecongress.org/api/v1/bills.json?apikey=c448541518f24d79b652ccc57b384815&bill_id=hr3590-111
+MAX_DAYS_FOR_RECENT_ACTIVITY = 30
 
 class BaseHandler(webapp.RequestHandler):
     user = None
@@ -107,21 +108,23 @@ class MainPage(BaseHandler):
             if year and month and day:
                 date_obj = datetime.datetime(int(year), int(month), int(day))            
             else:
-                date_obj = get_most_recent_day() 
+                date_obj = Activity.Activity.get_most_recent_day() 
             
             if date_obj:
-                activities = get_activities_by_day(date_obj)
+                todays_activities = Activity.Activity.get_activities_by_day(date_obj)
                 day_string = date_obj.strftime('%b %d')
-                previous_day = get_previous_day(date_obj)
-                next_day = get_next_day(date_obj)
+                previous_day = Activity.Activity.get_previous_day(date_obj)
+                next_day = Activity.Activity.get_next_day(date_obj)
+                
+                recent_activities = Activity.Activity.get_recent_N_days_activities(MAX_DAYS_FOR_RECENT_ACTIVITY)
                 
                 self.render('index', 
-                                activities=activities,
+                                todays_activities=recent_activities,#todays_activities,
                                 day_string=day_string,
                                 previous_day=previous_day,
                                 next_day=next_day)
-        except:
-            logging.error('Error in main page handler')
+        except Exception as e:
+            logging.error('Error in main page handler: ' + str(e))
             
 
 class AjaxUpdateCount(BaseHandler):        
@@ -129,44 +132,6 @@ class AjaxUpdateCount(BaseHandler):
         update_count = self.user.get_update_count()        
         self.render('ajax_update_count', update_count=update_count)
 
-def get_previous_day(reference_day):
-    q = Activity.Activity.all()
-    q.order('-day')
-    results = q.run()
-    for a in results:
-        if a.day < reference_day:
-            return a.day
-
-def get_next_day(reference_day):
-    q = Activity.Activity.all()
-    q.order('-day')
-    results = q.run()
-    prev_a = None    
-    for a in results:
-        if a.day == reference_day:
-            if prev_a:
-                return prev_a.day
-            else:
-                return None
-        prev_a = a
-    return None
-
-def get_most_recent_day():
-    q = Activity.Activity.all()
-    q.order('-day')
-    results = q.fetch(1)
-    if (len(results) > 0):
-        most_recent_day = results[0].day
-        return most_recent_day
-    return None
-
-def get_activities_by_day(date_obj):
-    q = Activity.Activity.all()
-    q.filter('day = ', date_obj)
-    results = q.fetch(50)
-    if (len(results) > 0):
-        return results
-    return None
 
 class RecentVotesPage(BaseHandler):
     def get(self):
@@ -179,7 +144,7 @@ class UpdatesPage(BaseHandler):
     def get(self):
         if self.user:
             updated_bills = self.user.get_updated_bills()        
-            recent_bills = self.user.get_recent_bills()        
+            recent_bills = self.user.get_recent_bills(MAX_DAYS_FOR_RECENT_ACTIVITY)        
       
             user_votes = self.user.vote_set.order('-created')
             
