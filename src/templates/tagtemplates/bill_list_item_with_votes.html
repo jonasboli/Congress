@@ -1,0 +1,5 @@
+{% extends "tagtemplates/bill_list_item.html" %}
+
+{% block votes %}
+    {% show_vote_counts user bill %}
+{% endblock %}

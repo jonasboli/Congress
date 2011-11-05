@@ -26,7 +26,41 @@ class Bill(db.Model):
     last_passage_vote_at = db.DateTimeProperty()
     last_house_vote = db.Key()
     last_senate_vote = db.Key()
+
+
     
+    def get_aye_count(self):
+        return self.__get_vote_count('aye')
+
+    def get_nay_count(self):
+        return self.__get_vote_count('nay')
+
+    def get_abstention_count(self):
+        return self.__get_vote_count('abstain')
+    
+    def __get_vote_count(self, vote_type):
+        q = self.vote_set
+        q.filter('value = ', db.Category(vote_type))
+        return q.count()
+
+
+
+    def get_last_senate_vote(self):
+        return self.__get_last_congressionalvote('senate')
+    
+    def get_last_house_vote(self):
+        return self.__get_last_congressionalvote('house')
+
+    def __get_last_congressionalvote(self, chamber):
+        c_vs = self.congressionalvote_set
+        c_vs.order('-voted_at')
+            
+        for c_v in self.congressionalvote_set:
+            if c_v.chamber == chamber:
+                return c_v
+    
+
+      
     @staticmethod
     def get_by_chamber_and_number(chamber, number):
         q = Bill.all()

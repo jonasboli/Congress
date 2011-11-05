@@ -14,19 +14,20 @@
 
 {% block content %}
     {% if todays_activities %}
+        <div style="font-weight:bold">Today's Bills:</div>
 	    {% for a in todays_activities %}
-		   <div class="bill" onclick="window.location.href = '/bill/{{a.bill.chamber}}/{{a.bill.number}}';">
-		       <div class="carrot">
-		           >
-	           </div>
-			   <div class="bill_list_item">
-			          House Bill {{a.bill.number}}: <br /> 
-			          {{a.bill.short_title}}
-			   </div>
-	       </div>
+	       {% show_bill_list_item a.bill %}
 	    {% endfor %}
     {% else %}
-        Sorry, no bills on this day!
+        Sorry, no bills today!
+    {% endif %}
+    
+    {% if recent_activities %}
+        <br /><br /><br />
+        <div style="font-weight:bold">Recent Bills:</div>
+        {% for a in recent_activities %}
+           {% show_bill_list_item a.bill %}
+        {% endfor %}
     {% endif %}
 {% endblock %}
     

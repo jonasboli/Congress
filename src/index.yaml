@@ -25,5 +25,10 @@ indexes:
 - kind: Vote
   properties:
   - name: user
+  - name: bill.last_passage_vote_at
+
+- kind: Vote
+  properties:
+  - name: user
   - name: created
     direction: desc

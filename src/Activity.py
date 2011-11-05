@@ -40,6 +40,7 @@ class Activity(db.Model):
     def get_activities_by_day(date_obj):
         q = Activity.all()
         q.filter('day = ', date_obj)
+        q.order('-day')
         results = q.fetch(50)
         if (len(results) > 0):
             return results
@@ -50,6 +51,8 @@ class Activity(db.Model):
     def get_recent_N_days_activities(count_days):
         q = Activity.all()
         q.filter('day > ', (datetime.datetime.now() - datetime.timedelta(count_days)))
+        q.filter('day < ', Activity.get_most_recent_day())
+        q.order('-day')
         results = q.fetch(50)
         if (len(results) > 0):
             return results

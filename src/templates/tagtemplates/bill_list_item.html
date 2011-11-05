@@ -1,0 +1,9 @@
+<div class="bill" onclick="window.location.href = '/bill/{{bill.chamber}}/{{bill.number}}';">
+	<div class="carrot">></div>
+	<div class="bill_list_item">
+		House Bill {{bill.number}}: <br /> {{bill.short_title}}
+	</div>
+	<br />
+	{% block votes %}
+    {% endblock %}
+</div>

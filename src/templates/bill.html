@@ -29,73 +29,10 @@
         <div class="vote_div">
             <div class="vote_label">Voting:</div>
             {% if not vote %}
-            <div id="vote_buttons" class="vote_buttons">
-				<div id="aye" class="vote_button" onclick="vote('{{bill.chamber}}','{{bill.number}}', 'aye');">
-				  Aye
-				</div>
-				<div id="nay" class="vote_button" onclick="vote('{{bill.chamber}}','{{bill.number}}', 'nay');">
-				  Nay
-				</div>
-				<div id="abstain" class="vote_button" onclick="vote('{{bill.chamber}}','{{bill.number}}', 'abstain');">
-				  Abstain
-			    </div>
-		    </div>
+                {% show_vote_buttons bill %}
 		    {% endif %}
-            <div id="vote_counts_div" class="vote_counts_div" 
-                    {% if not vote %} style="display:none" {% endif %} 
-                    >
-                <div>
-					<div id="aye_count_div" class="vote_count_div 
-					        {% ifequal vote.value 'aye' %} 
-					        vote_count_div_voted 
-					        {% endifequal %}
-					        ">
-					    <div class="vote_count_label">Ayes</div>
-					    <div id="aye_count" class="vote_count">{{aye_count}}</div>
-					</div>
-					<div id="nay_count_div" class="vote_count_div 
-					        {% ifequal vote.value 'nay' %} 
-					        vote_count_div_voted 
-					        {% endifequal %}
-					        ">
-					    <div class="vote_count_label">Nays</div>
-					    <div id="nay_count" class="vote_count">{{nay_count}}</div>
-					</div>
-					<div id="abstention_count_div" class="vote_count_div 
-					        {% ifequal vote.value 'abstain' %} 
-					        vote_count_div_voted 
-					        {% endifequal %}
-					        ">
-					    <div class="vote_count_label">Abstentions</div>
-					    <div id="abstention_count" class="vote_count">{{abstention_count}}</div>
-					</div>
-				</div>
-				<div>
-				    {% for c_v in bill.congressionalvote_set %}
-						<div class="vote_counts_div">
-						    {{c_v.chamber|capfirst}}&nbsp;Votes: 
-		                    <div class="vote_count_div 
-		                            {% ifequal c_v.result 'Passed' %} 
-		                              vote_count_div_voted 
-		                            {% endifequal %}">
-		                        <div class="vote_count_label">Ayes</div>
-		                        <div class="vote_count">{{c_v.yeas}}</div>
-		                    </div>
-		                    <div class="vote_count_div 
-		                            {% ifequal c_v.result|lower 'Failed' %} 
-		                              vote_count_div_voted 
-		                            {% endifequal %}">
-		                        <div class="vote_count_label">Nays</div>
-		                        <div class="vote_count">{{c_v.nays}}</div>
-		                    </div>
-						    <div class="vote_count_div">
-						        <div class="vote_count_label">Abstentions</div>
-						        <div class="vote_count">{{c_v.abstentions}}</div>
-						    </div>
-						</div>                            
-				    {% endfor %}
-				</div>
-            </div>
+		    
+		    {% show_vote_counts user bill %}
         </div>
 		<div class="hr"></div>
 		<div id="comments_toggle" class="comments_toggle" onclick="show_hide_comments()">show comments</div>

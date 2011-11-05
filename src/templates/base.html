@@ -19,7 +19,7 @@
 		<a class="header_link header_link_right" href="/updates">
            U
 	       <div id="update_count" class="update_count">
-              1
+              {{ update_count }}
            </div>
 		</a>
       </div>
@@ -73,9 +73,9 @@
     </script>
     <script type="text/javascript" charset="utf-8"> 
             /* JS for fetching the bill updates count */
-            $(document).ready(function(){
+            /*$(document).ready(function(){
             	   //alert('updating update count');
-                	update_count = 3;//data.update_count;//TODO: make this come from the server
+                	update_count = //data.update_count;//TODO: make this come from the server
                 	update_update_count(update_count);
             	});
             
@@ -88,7 +88,7 @@
                 else if (count > 0){
                     update_count_div.style.display = 'inline-block';
                 }
-            }
+            }*/
     </script>
     
   {% block scripts %}

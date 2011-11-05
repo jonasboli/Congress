@@ -24,9 +24,12 @@ RTC.apikey = 'c448541518f24d79b652ccc57b384815'
 #http://api.realtimecongress.org/api/v1/bills.json?apikey=c448541518f24d79b652ccc57b384815&bill_id=hr3590-111
 MAX_DAYS_FOR_RECENT_ACTIVITY = 30
 
+webapp.template.register_template_library('CustomTemplateTags')
+
 class BaseHandler(webapp.RequestHandler):
     user = None
     new_user_id = None
+    update_count = None
 
     def initialize(self, request, response):
         """General initialization for every request"""
@@ -41,6 +44,7 @@ class BaseHandler(webapp.RequestHandler):
             if self.user:
                 self.user.last_visit_at = datetime.datetime.now()
                 self.user.put()
+                self.update_count = self.user.get_update_count_since_last_visit()
             
         except Exception, ex:
             raise
@@ -86,6 +90,7 @@ class BaseHandler(webapp.RequestHandler):
             data = {}
         data['user'] = self.user
         data['new_user_id'] = self.new_user_id
+        data['update_count'] = self.update_count
         self.response.out.write(template.render(
             os.path.join(
                 os.path.dirname(__file__), 'templates', name + '.html'),
@@ -110,7 +115,8 @@ class MainPage(BaseHandler):
                 recent_activities = Activity.Activity.get_recent_N_days_activities(MAX_DAYS_FOR_RECENT_ACTIVITY)
                 
                 self.render('index', 
-                                todays_activities=recent_activities,#todays_activities,
+                                todays_activities=todays_activities,
+                                recent_activities=recent_activities,
                                 day_string=day_string,
                                 previous_day=previous_day,
                                 next_day=next_day)
@@ -134,14 +140,10 @@ class RecentVotesPage(BaseHandler):
 class UpdatesPage(BaseHandler):
     def get(self):
         if self.user:
-            updated_bills = self.user.get_updated_bills()        
-            recent_bills = self.user.get_recent_bills(MAX_DAYS_FOR_RECENT_ACTIVITY)        
+            updated_bills = self.user.get_updated_bills_since_last_visit()        
+            recent_bills = self.user.get_recently_updated_bills(MAX_DAYS_FOR_RECENT_ACTIVITY)        
       
-            user_votes = self.user.vote_set.order('-created')
-            
-            #TODO - make the front end render using the bills, not the user votes
             self.render('updates',
-                        user_votes=user_votes,
                         updated_bills=updated_bills,
                         recent_bills=recent_bills)
         else:        
@@ -168,35 +170,16 @@ class ZipHandler(BaseHandler):
 
 class BillPage(BaseHandler):
     def get(self, chamber=None, number=None):
-        #bill = get_bill(chamber, number)
         bill = Bill.Bill.get_by_chamber_and_number(chamber, number)
-        
-        #calculate vote counts
-        q = bill.vote_set
-        q.filter('value = ', db.Category('aye'))
-        aye_count = q.count()
-        q = bill.vote_set
-        q.filter('value = ', db.Category('nay'))
-        nay_count = q.count()
-        q = bill.vote_set
-        q.filter('value = ', db.Category('abstain'))
-        abstention_count = q.count()
         
         #get the user's vote, if any
         vote = None
         if(self.user):
-            q = self.user.vote_set
-            q.filter('bill = ', bill)
-            results = q.fetch(1)
-            if len(results) > 0:
-                vote = results[0]
+            vote = self.user.get_vote_for_bill(bill)
         
         self.render('bill',
                         bill=bill,
-                        vote=vote,
-                        aye_count=aye_count,
-                        nay_count=nay_count,
-                        abstention_count=abstention_count)
+                        vote=vote)
       
 class VoteHandler(BaseHandler):
     def post(self):        
@@ -238,6 +221,8 @@ application = webapp.WSGIApplication(
                                         ('/tasks/scrape', ScrapeWorker),
                                         ('/tasks/process_congressional_votes', CongressionalVotesWorkerHandler)],
                                      debug=True)
+
+
 
 def main():
     logging.getLogger().setLevel(logging.DEBUG)

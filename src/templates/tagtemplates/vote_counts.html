@@ -1,0 +1,41 @@
+
+<div id="vote_counts_div" class="vote_counts_div" 
+    {% if not vote %} style="display: none"{% endif %} 
+                    >
+	<div>
+	    User Votes:
+		<div id="aye_count_div"
+			class="vote_count_div 
+                            {% ifequal vote.value 'aye' %} 
+                            vote_count_div_voted 
+                            {% endifequal %}
+                            ">
+			<div class="vote_count_label">Ayes</div>
+			<div id="aye_count" class="vote_count">{{aye_count}}</div>
+		</div>
+		<div id="nay_count_div"
+			class="vote_count_div 
+                            {% ifequal vote.value 'nay' %} 
+                            vote_count_div_voted 
+                            {% endifequal %}
+                            ">
+			<div class="vote_count_label">Nays</div>
+			<div id="nay_count" class="vote_count">{{nay_count}}</div>
+		</div>
+		<div id="abstention_count_div"
+			class="vote_count_div 
+                            {% ifequal vote.value 'abstain' %} 
+                            vote_count_div_voted 
+                            {% endifequal %}
+                            ">
+			<div class="vote_count_label">Abstentions</div>
+			<div id="abstention_count" class="vote_count">{{abstention_count}}</div>
+		</div>
+	</div>
+	{% if last_house_vote %}
+           {% show_congressionalvote_counts last_house_vote %}
+	{% endif %}
+	{% if last_senate_vote %}
+           {% show_congressionalvote_counts last_senate_vote %}
+    {% endif %}
+</div>

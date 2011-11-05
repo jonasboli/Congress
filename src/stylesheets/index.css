@@ -11,8 +11,8 @@
 .bill
 {
     display:block;
-    border-bottom: 1px solid gray;
-    height:70px;
+    border-bottom: 1px solid #DDDDDD;
+ //   height:70px;
     //width:100%;
     padding-top:15px;
     padding-left:10px;

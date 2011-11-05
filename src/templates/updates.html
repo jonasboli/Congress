@@ -4,49 +4,34 @@
     Updates on My Bills
 {% endblock %}        
 
+{% block stylesheets %}                            
+    <link type="text/css" rel="stylesheet" href="/stylesheets/index.css" />
+    <link type="text/css" rel="stylesheet" href="/stylesheets/bill.css" />
+{% endblock %}
+
+
 {% block content %}
-    {% if not user_votes %}
+
+    <div style="font-weight:bold">Updated Bills Since Last Visit:</div>
+    {% if not updated_bills %}
         <div>
             Sorry, no updates for you today.
-            TODO: show all recent updates.
         </div>
-    {% else %}
-	    {% for v in user_votes %}
-	        {% for c_v in v.bill.congressionalvote_set %}
-	           <div class="bill" onclick="window.location.href = '/bill/{{v.bill.chamber}}/{{v.bill.number}}';">
-	               <div class="carrot">
-	                   >
-	               </div>
-	               <div class="bill_list_item">
-						<div>
-						      H.R. {{v.bill.number}}: {{v.bill.short_title}}
-						</div>
-						<div>
-						      Your vote:  {{v.value|capfirst}}
-						</div>
-						<div>
-						      Congress vote:  {{c_v.result}}
-						</div>
-						<div id="vote_counts_div" class="vote_counts_div"> 
-							<div class="vote_count_div">
-							    <div class="vote_count_label">Ayes</div>
-							    <div id="aye_count" class="vote_count">{{c_v.yeas}}</div>
-							</div>
-							<div class="vote_count_div">
-							    <div class="vote_count_label">Nays</div>
-							    <div id="nay_count" class="vote_count">{{c_v.nays}}</div>
-							</div>
-							<div class="vote_count_div">
-							    <div class="vote_count_label">Abstentions</div>
-							    <div id="abstention_count" class="vote_count">{{c_v.abstentions}}</div>
-							</div>
-						</div>
-	            </div>
-	               </div>
-	           </div>
-	        {% endfor %}
+    {% else %}    
+	    {% for b in updated_bills %}
+	        {% show_bill_list_item_with_votes user b %}
 	    {% endfor %}
     {% endif %}
+
+    {% if recent_bills %}
+        <br /><br /><br />
+        <div style="font-weight:bold">Recently Updated Bills:</div>
+	        {% for b in recent_bills %}
+	            {% show_bill_list_item_with_votes user b %}
+	        {% endfor %}
+	    </div>
+	{% endif %}
+
 {% endblock %}
 
 {% block scripts %}
