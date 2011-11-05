@@ -2,9 +2,6 @@ import cgi
 import os
 import logging
 import datetime 
-import time
-import sys
-import string
 import Cookie   
 import uuid
 
@@ -13,18 +10,12 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext import db
 from google.appengine.ext.webapp import template, util
-from BeautifulSoup import BeautifulSoup
-import urllib2
-import re
 import RTC
-from pprint import *
 
 import User
 import Bill
 import Activity
 import Vote
-import CongressionalVote
-import CongressPerson
 import CongressScraper
 import CongressionalVotesWorker
 

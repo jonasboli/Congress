@@ -1,35 +1,14 @@
-import cgi
-import os
 import logging
 import datetime 
-import time
-import sys
-import string
-import Cookie   
-import uuid
 
-from google.appengine.api import users
-from google.appengine.ext import webapp
-from google.appengine.ext.webapp.util import run_wsgi_app
-from google.appengine.ext import db
-from google.appengine.ext.webapp import template, util
-import urllib2
-import re
-from pprint import *
-
-from BeautifulSoup import BeautifulSoup
 import RTC
 RTC.API_KEY = 'c448541518f24d79b652ccc57b384815'
 RTC.apikey = 'c448541518f24d79b652ccc57b384815'
+
 MAX_ACTIVITIES_TO_PROCESS = 10
 
-
-import User
-import Bill
 import Activity
-import Vote
 import CongressionalVote
-import CongressPerson
 
 
 

@@ -1,24 +1,7 @@
-import cgi
-import os
 import logging
 import datetime 
-import time
-import sys
-import string
-import Cookie   
-import uuid
 
-from google.appengine.api import users
-from google.appengine.ext import webapp
-from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext import db
-from google.appengine.ext.webapp import template, util
-import urllib2
-import re
-from pprint import *
-
-
-
 
 class User(db.Model):
     zip = db.StringProperty()
@@ -48,7 +31,7 @@ class User(db.Model):
             if v.bill.last_passage_vote_at == None:
                 continue
            
-            #filter to bills updated in the last 10 days
+            #filter to bills updated in the last N days
             if v.bill.last_passage_vote_at > (datetime.datetime.now() - datetime.timedelta(days=-count)):
                 recent_bills = recent_bills + v.bill
                 #TODO: sort the bills by updated date
